@@ -1,0 +1,29 @@
+{
+  "name": "y",
+  "version": "1.0.0",
+  "description": "api email sender",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ogheneovo12/emailapp.git"
+  },
+  "keywords": [
+    "email",
+    "cronjob"
+  ],
+  "author": "dsc challenge",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ogheneovo12/emailapp/issues"
+  },
+  "homepage": "https://github.com/ogheneovo12/emailapp#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-handlebars": "^3.1.0",
+    "node-cron": "^2.0.3",
+    "nodemailer": "^6.2.1"
+  }
+}
