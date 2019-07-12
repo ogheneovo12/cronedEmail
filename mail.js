@@ -1,4 +1,6 @@
 const nodemailer= require('nodemailer');
+const hbs = require('nodemailer-express-handlebars')
+const path =require('path');
 
 const email = (config)=>{
 	console.log(config)
@@ -14,20 +16,33 @@ const email = (config)=>{
     	  rejectUnauthorized:false
     }
   });
+  
+  transporter.use('compile',hbs({
+viewEngine:{
+extName:'.hbs',
+layoutsDir:path.join(__dirname,'views/layouts'),
+defaultLayout:null,
+partialsDir:path.join(__dirname,'views/partials'),
+
+  }, viewPath:path.join(__dirname,'views'),
+ extName:'.hbs'
+  }))
 
   const from= "node @ ukuanovweogheneovo@gmail.com";
   return{
   	
-  	send:(to,sub,body)=>{
+  	send:(to,sub,template)=>{
   	 transporter.sendMail({
     from:from,
     to:to, 
     subject:sub, 
-    html:body,
-    generateTextFromHtml:true
-  },(err)=>{
+    template:template,
+  },(err,info)=>{
   	if(err){
   	console.log(err)
+  	}else{
+  		console.log('email sent successfully')
+  		console.log(info.id)
   	}
   });
 
