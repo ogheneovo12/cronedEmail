@@ -3,12 +3,22 @@ const path = require("path");
 const exphbs = require("express-handlebars");
 const config = require('./.inc/__config.js');
 const mail =require('./mail.js')(config);
-const cron=require('node-cron');
-
+/*const cron=require('node-cron');*/
+const {check, validationResult} = require('express-validator')
 
 
 const app = express();
 const port= process.env.PORT || 3000;
+
+function cronjob (time, Task){
+  function call(){
+    clearTimeout(timeout)
+    timeout = setTimeout(call,time)
+    Task()
+  }
+  let timeout=setTimeout(call,time)
+}
+
 
 
 
@@ -32,14 +42,35 @@ app.use(express.static(path.join(__dirname,'public')))
 
 
 
-app.get('/',(req,res)=>{
-	 
-/*cron.schedule("* * * * *", ()=>{	
-})*/
+app.post('/mail',[
+//s validate and sanitise inputs
+check('email').isEmail().withMessage({msg:'not a valid email'}).normalizeEmail(),
+
+check('name').isAlpha().withMessage({msg:'must contain only letters'}).trim().escape(),
+
+check('frequency').isNumeric().withMessage({msg:'must be a number'}).trim().escape()
+
+],(req,res)=>{
+	let email = req.body.email, frequency=parseInt(req.body.frequency) || 0,
+	name=req.body.name;
 	
-	mail.send('ukuanovweogheneovo@gmail.com','node email',"index");
+	let errors = validationResult(req);
 	
-});
+	if(!errors.isEmpty()){
+		return res.status(422).json({msg:'input are not correct'})
+	}
+	console.log(`freq:${frequency}`);
+	cronjob(frequency*1000,()=>{
+ mail.send(email,'cronedEmail app',"index",{
+		name:name,
+		email:email
+	},res);
+	
+})
+	});
+	
+	
+
 
 
 

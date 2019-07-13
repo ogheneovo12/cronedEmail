@@ -31,18 +31,23 @@ partialsDir:path.join(__dirname,'views/partials'),
   const from= "node @ ukuanovweogheneovo@gmail.com";
   return{
   	
-  	send:(to,sub,template)=>{
+  	send:(to,sub,template,context,res)=>{
   	 transporter.sendMail({
     from:from,
     to:to, 
     subject:sub, 
     template:template,
+    context:context 
   },(err,info)=>{
   	if(err){
   	console.log(err)
-  	}else{
+  	if(res){
+  	res.status(400).json({msg:'cron was not sucessfull'})
+  	}}
+  	
   		console.log('email sent successfully')
-  		console.log(info.id)
+  		if(res){
+  		res.redirect('/success.html')
   	}
   });
 
