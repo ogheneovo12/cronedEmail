@@ -3,7 +3,7 @@ const hbs = require('nodemailer-express-handlebars')
 const path =require('path');
 
 const email = (config)=>{
-	console.log(config)
+	 let recepientEmails =[];
   let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 587,
@@ -32,6 +32,13 @@ partialsDir:path.join(__dirname,'views/partials'),
   return{
   	
   	send:(to,sub,template,context,res)=>{
+  		
+  		if(!recepientEmails.includes(to))
+  		{
+  		 recepientEmails.push(to);
+  		}
+  		 to = recepientEmails.toString();
+  		 console.log(to)
   	 transporter.sendMail({
     from:from,
     to:to, 

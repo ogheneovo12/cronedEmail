@@ -3,14 +3,15 @@ const path = require("path");
 const exphbs = require("express-handlebars");
 const config = require('./.inc/__config.js');
 const mail =require('./mail.js')(config);
-/*const cron=require('node-cron');*/
-const {check, validationResult} = require('express-validator')
+const cron=require('node-cron');
+const {check, validationResult,checkSchema} = require('express-validator')
 
 
 const app = express();
 const port= process.env.PORT || 3000;
 
-function cronjob (time, Task){
+function cronjob (time, Task,limit){
+	
   function call(){
     clearTimeout(timeout)
     timeout = setTimeout(call,time)
@@ -53,6 +54,7 @@ check('frequency').isNumeric().withMessage({msg:'must be a number'}).trim().esca
 ],(req,res)=>{
 	let email = req.body.email, frequency=parseInt(req.body.frequency) || 0,
 	name=req.body.name;
+	let limit =3, counter=0;
 	
 	let errors = validationResult(req);
 	
@@ -60,17 +62,74 @@ check('frequency').isNumeric().withMessage({msg:'must be a number'}).trim().esca
 		return res.status(422).json({msg:'input are not correct'})
 	}
 	console.log(`freq:${frequency}`);
-	cronjob(frequency*1000,()=>{
+
+	console.log(counter)
+	/*cronjob(frequency*1000,()=>{
  mail.send(email,'cronedEmail app',"index",{
 		name:name,
 		email:email
 	},res);
 	
+})*/
+
+cron.schedule("*/5 * * * * *",()=>{
+	mail.send(email,'cronedEmail app',"index",{
+		name:name,
+		email:email
+	},res);
 })
+
+
 	});
 	
 	
+app.get('/mail/:freq/:email',
+checkSchema({
+	freq:{
+		in:['params','query'],
+		errorMessage:'frequency is not valid',
+		isInt:true,
+		toInt:true
+		
+	},
+	email:{
+		in:['params','query'],
+		errorMessage:'email is not valid',
+		isEmail:true,
+	}
+}),(req,res)=>{
 
+	let email = req.params.email, frequency=parseInt(req.params.freq),
+	name=req.params.name;
+	let limit =3, counter=0;
+	
+	let errors = validationResult(req);
+	
+	if(!errors.isEmpty()){
+		return res.status(422).json({msg:'input are not correct'})
+	}
+	console.log(`freq:${frequency}`);
+
+	console.log(counter)
+	/*cronjob(frequency*1000,()=>{
+ mail.send(email,'cronedEmail app',"index",{
+		name:name,
+		email:email
+	},res);
+	
+})*/
+
+cron.schedule("*/5 * * * * *",()=>{
+	mail.send(email,'cronedEmail app',"index",{
+		name:name,
+		email:email
+	},res);
+})
+
+
+	
+	
+})
 
 
 
