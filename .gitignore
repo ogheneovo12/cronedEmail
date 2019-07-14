@@ -1,3 +1,5 @@
 /node_modules
 /.inc/__config.js
-
+npm-debug.log
+.DS_Store
+/*.env
