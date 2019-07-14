@@ -38,7 +38,6 @@ partialsDir:path.join(__dirname,'views/partials'),
   		 recepientEmails.push(to);
   		}
   		 to = recepientEmails.toString();
-  		 
   	 transporter.sendMail({
     from:from,
     to:to, 

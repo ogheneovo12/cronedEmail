@@ -138,6 +138,9 @@ checkSchema({
 		 res.send({msg:'limit not set cron job wont start please choose a limit from one and above'});
 	}
 	
+
+	
+	
 	let errors = validationResult(req);
 	
 	if(!errors.isEmpty()){
@@ -151,6 +154,7 @@ let task = cron.schedule(`*/${frequency} * * * * *`,()=>{
 	
 	  
 //SEND MAIL
+
 	mail.send(email,'cronedEmail app',"index",{
 		name:name,
 		email:email
