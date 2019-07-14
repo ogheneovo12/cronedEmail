@@ -44,9 +44,9 @@ app.use(express.static(path.join(__dirname,'public')))
 
 
 app.post('/mail',[
-//s validate and sanitise inputs
+//validate and sanitise inputs
 check('email').isEmail().withMessage({msg:'not a valid email'}).normalizeEmail(),
-
+check('limit').isNumeric().withMessage('limit is valid'),
 check('name').isAlpha().withMessage({msg:'must contain only letters'}).trim().escape(),
 
 check('frequency').isNumeric().withMessage({msg:'must be a number'}).trim().escape()
@@ -54,8 +54,16 @@ check('frequency').isNumeric().withMessage({msg:'must be a number'}).trim().esca
 ],(req,res)=>{
 	let email = req.body.email, frequency=parseInt(req.body.frequency) || 0,
 	name=req.body.name;
-	let limit =3, counter=0;
+	//set counter to 1 to determine how many time cron job will run based on limit passed
 	
+	let limit =req.body.limit, counter=1;
+	
+	//checks if limit is valid
+	if(limit == 0 || limit == 'undefined'){
+		 res.send({msg:'limit not set cron job wont start please choose a limit from one and above'})
+	}
+	
+	//check for errors in validation
 	let errors = validationResult(req);
 	
 	if(!errors.isEmpty()){
@@ -71,18 +79,33 @@ check('frequency').isNumeric().withMessage({msg:'must be a number'}).trim().esca
 	
 })*/
 
-cron.schedule("*/5 * * * * *",()=>{
+
+
+//START CRON JOB
+let task = cron.schedule(`*/${frequency} * * * * *`,()=>{
+	
+	  
+	  
+	  //send mail
 	mail.send(email,'cronedEmail app',"index",{
 		name:name,
 		email:email
 	},res);
+	if(counter >= limit){
+	  	//Destroys Cron job
+	  	task.destroy()
+	  
+	  }
+	  //increment counter
+	counter++
 })
+
 
 
 	});
 	
 	
-app.get('/mail/:freq/:email',
+app.get('/mail/:freq/:limit/:email',
 checkSchema({
 	freq:{
 		in:['params','query'],
@@ -90,6 +113,12 @@ checkSchema({
 		isInt:true,
 		toInt:true
 		
+	},
+	limit:{
+		in:['params','query'],
+		errorMessage:'limit not set cron job wont start please choose a limit from one(1) and above',
+		isInt:true,
+		toInt:true
 	},
 	email:{
 		in:['params','query'],
@@ -100,35 +129,44 @@ checkSchema({
 
 	let email = req.params.email, frequency=parseInt(req.params.freq),
 	name=req.params.name;
-	let limit =3, counter=0;
+	let limit =req.params.limit,
+	//set counter to 1 to determine how many time cron job will run based on limit passed
+	 counter=1;
+	 
+	//checks if limit is valid
+	if(limit == 0 || limit == 'undefined'){
+		 res.send({msg:'limit not set cron job wont start please choose a limit from one and above'});
+	}
 	
 	let errors = validationResult(req);
 	
 	if(!errors.isEmpty()){
-		return res.status(422).json({msg:'input are not correct'})
+		return res.status(422).json({msg:'input are not correct'});
 	}
 
 
-	
-	/*cronjob(frequency*1000,()=>{
- mail.send(email,'cronedEmail app',"index",{
-		name:name,
-		email:email
-	},res);
-	
-})*/
 
-cron.schedule("*/5 * * * * *",()=>{
+//START CRON JOB
+let task = cron.schedule(`*/${frequency} * * * * *`,()=>{
+	
+	  
+//SEND MAIL
 	mail.send(email,'cronedEmail app',"index",{
 		name:name,
 		email:email
 	},res);
-})
-
+	
+	if(counter >= limit){
+	  	//Destroys Cron job
+	     	task.destroy()
+	     	
+	  }
+	//increment counter
+	counter++
+});
 
 	
-	
-})
+});
 
 
 
