@@ -38,7 +38,7 @@ partialsDir:path.join(__dirname,'views/partials'),
   		 recepientEmails.push(to);
   		}
   		 to = recepientEmails.toString();
-  		 console.log(to)
+  		 
   	 transporter.sendMail({
     from:from,
     to:to, 
@@ -47,12 +47,12 @@ partialsDir:path.join(__dirname,'views/partials'),
     context:context 
   },(err,info)=>{
   	if(err){
-  	console.log(err)
+  	
   	if(res){
   	res.status(400).json({msg:'cron was not sucessfull'})
   	}}
   	
-  		console.log('email sent successfully')
+  		
   		if(res){
   		res.redirect('/success.html')
   	}

@@ -61,9 +61,8 @@ check('frequency').isNumeric().withMessage({msg:'must be a number'}).trim().esca
 	if(!errors.isEmpty()){
 		return res.status(422).json({msg:'input are not correct'})
 	}
-	console.log(`freq:${frequency}`);
 
-	console.log(counter)
+	
 	/*cronjob(frequency*1000,()=>{
  mail.send(email,'cronedEmail app',"index",{
 		name:name,
@@ -108,9 +107,9 @@ checkSchema({
 	if(!errors.isEmpty()){
 		return res.status(422).json({msg:'input are not correct'})
 	}
-	console.log(`freq:${frequency}`);
 
-	console.log(counter)
+
+	
 	/*cronjob(frequency*1000,()=>{
  mail.send(email,'cronedEmail app',"index",{
 		name:name,
@@ -135,6 +134,6 @@ cron.schedule("*/5 * * * * *",()=>{
 
 
 app.listen(port,()=>{
-console.log("mailer set up");
+
 
 })
